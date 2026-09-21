@@ -1,0 +1,37 @@
+{
+  "name": "yan-calligraphy",
+  "type": "module",
+  "private": true,
+  "packageManager": "pnpm@10.11.1",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "typecheck": "nuxt typecheck",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate"
+  },
+  "dependencies": {
+    "@pinia/nuxt": "^0.11.2",
+    "better-sqlite3": "^13.0.3",
+    "drizzle-orm": "^0.45.2",
+    "naive-ui": "^2.45.3",
+    "nuxt": "^4.5.2",
+    "pinia": "^3.0.3",
+    "sharp": "^0.34.4",
+    "vue": "^3.5.43",
+    "vue-router": "^5.3.1",
+    "zod": "^4.1.5"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "drizzle-kit": "^0.31.10",
+    "typescript": "~5.9.2",
+    "vue-tsc": "^3.3.11"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
