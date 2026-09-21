@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { AssetListResponse } from '~~/shared/schemas/asset'
+import type { CompositionListResponse } from '~~/shared/schemas/composition'
+import { LAYOUT_TYPE_LABELS } from '~~/shared/layout/defaults'
 import { useMessage } from 'naive-ui'
 
 interface HealthResponse {
@@ -12,6 +14,8 @@ const message = useMessage()
 const health = ref<HealthResponse | null>(null)
 const assets = ref<AssetListResponse['items']>([])
 const assetTotal = ref(0)
+const compositions = ref<CompositionListResponse['items']>([])
+const compositionTotal = ref(0)
 const loading = ref(true)
 const errorText = ref('')
 
@@ -19,13 +23,16 @@ async function loadDashboard() {
   loading.value = true
   errorText.value = ''
   try {
-    const [healthResponse, assetResponse] = await Promise.all([
+    const [healthResponse, assetResponse, compositionResponse] = await Promise.all([
       $fetch<HealthResponse>('/api/health'),
       $fetch<AssetListResponse>('/api/assets', { query: { page: 1, pageSize: 8 } }),
+      $fetch<CompositionListResponse>('/api/compositions', { query: { page: 1, pageSize: 6 } }),
     ])
     health.value = healthResponse
     assets.value = assetResponse.items
     assetTotal.value = assetResponse.total
+    compositions.value = compositionResponse.items
+    compositionTotal.value = compositionResponse.total
   }
   catch (error) {
     health.value = null
@@ -61,11 +68,48 @@ onMounted(() => {
         </NCard>
       </NGridItem>
       <NGridItem>
-        <NCard title="最近作品">
-          <NEmpty description="阶段 03 实现" size="small" />
+        <NCard title="作品">
+          <NStatistic label="作品总数" :value="compositionTotal" />
+          <template #footer>
+            <NuxtLink to="/compose/new">
+              新建集字
+            </NuxtLink>
+          </template>
         </NCard>
       </NGridItem>
     </NGrid>
+
+    <NCard title="最近作品" class="recent">
+      <NEmpty v-if="!compositions.length" description="还没有作品，去集一句吧">
+        <template #extra>
+          <NButton type="primary" @click="navigateTo('/compose/new')">
+            新建集字
+          </NButton>
+        </template>
+      </NEmpty>
+      <NSpace v-else vertical>
+        <NuxtLink
+          v-for="item in compositions"
+          :key="item.id"
+          :to="`/compose/${item.id}`"
+          class="composition-row"
+        >
+          <div>
+            <div class="composition-title">
+              {{ item.title }}
+            </div>
+            <div class="composition-text">
+              {{ item.text }}
+            </div>
+          </div>
+          <div class="composition-meta">
+            {{ LAYOUT_TYPE_LABELS[item.layoutType] }}
+            ·
+            {{ new Date(item.updatedAt).toLocaleString('zh-CN') }}
+          </div>
+        </NuxtLink>
+      </NSpace>
+    </NCard>
 
     <NCard v-if="assets.length" title="最近上传" class="recent">
       <NGrid cols="2 560:4 920:8" :x-gap="12" :y-gap="12">
@@ -130,6 +174,39 @@ h1 {
 .recent,
 .status-card {
   margin-top: 20px;
+}
+
+.composition-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee8e0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.composition-row:last-child {
+  border-bottom: none;
+}
+
+.composition-title {
+  font-weight: 600;
+}
+
+.composition-text,
+.composition-meta {
+  color: #756d63;
+  font-size: 13px;
+}
+
+.composition-text {
+  margin-top: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 420px;
 }
 
 .recent-item {

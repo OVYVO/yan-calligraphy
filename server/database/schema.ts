@@ -21,3 +21,19 @@ export const characterAssets = sqliteTable('character_assets', {
 ])
 
 export type CharacterAsset = typeof characterAssets.$inferSelect
+
+export const compositions = sqliteTable('compositions', {
+  id: text('id').primaryKey(),
+  title: text('title').notNull(),
+  text: text('text').notNull(),
+  layoutType: text('layout_type').notNull(),
+  layoutConfig: text('layout_config').notNull(),
+  items: text('items').notNull(),
+  exportPath: text('export_path'),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+}, table => [
+  index('compositions_updated_at_idx').on(table.updatedAt),
+])
+
+export type Composition = typeof compositions.$inferSelect
