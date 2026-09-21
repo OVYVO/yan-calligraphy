@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AssetListResponse } from '~~/shared/schemas/asset'
 import { useMessage } from 'naive-ui'
 
 interface HealthResponse {
@@ -9,14 +10,22 @@ interface HealthResponse {
 
 const message = useMessage()
 const health = ref<HealthResponse | null>(null)
+const assets = ref<AssetListResponse['items']>([])
+const assetTotal = ref(0)
 const loading = ref(true)
 const errorText = ref('')
 
-async function checkHealth() {
+async function loadDashboard() {
   loading.value = true
   errorText.value = ''
   try {
-    health.value = await $fetch<HealthResponse>('/api/health')
+    const [healthResponse, assetResponse] = await Promise.all([
+      $fetch<HealthResponse>('/api/health'),
+      $fetch<AssetListResponse>('/api/assets', { query: { page: 1, pageSize: 8 } }),
+    ])
+    health.value = healthResponse
+    assets.value = assetResponse.items
+    assetTotal.value = assetResponse.total
   }
   catch (error) {
     health.value = null
@@ -29,7 +38,7 @@ async function checkHealth() {
 }
 
 onMounted(() => {
-  void checkHealth()
+  void loadDashboard()
 })
 </script>
 
@@ -37,10 +46,39 @@ onMounted(() => {
   <div>
     <h1>yan-calligraphy</h1>
     <p class="subtitle">
-      书法单字素材库与集字排版工作台 — Nuxt 4 管理台空壳
+      书法单字素材库与集字排版工作台
     </p>
 
-    <NCard title="框架状态" style="max-width: 560px; margin-top: 24px;">
+    <NGrid cols="1 720:2" :x-gap="20" :y-gap="20" class="dashboard">
+      <NGridItem>
+        <NCard title="素材">
+          <NStatistic label="素材总数" :value="assetTotal" />
+          <template #footer>
+            <NuxtLink to="/assets">
+              进入素材库
+            </NuxtLink>
+          </template>
+        </NCard>
+      </NGridItem>
+      <NGridItem>
+        <NCard title="最近作品">
+          <NEmpty description="阶段 03 实现" size="small" />
+        </NCard>
+      </NGridItem>
+    </NGrid>
+
+    <NCard v-if="assets.length" title="最近上传" class="recent">
+      <NGrid cols="2 560:4 920:8" :x-gap="12" :y-gap="12">
+        <NGridItem v-for="asset in assets" :key="asset.id">
+          <NuxtLink :to="`/assets/${asset.id}`" class="recent-item">
+            <img :src="asset.thumbUrl" :alt="asset.char">
+            <span>{{ asset.char }}</span>
+          </NuxtLink>
+        </NGridItem>
+      </NGrid>
+    </NCard>
+
+    <NCard title="框架状态" class="status-card">
       <NSpin :show="loading">
         <NSpace vertical :size="12">
           <div>渲染模式：CSR（ssr: false）</div>
@@ -64,7 +102,7 @@ onMounted(() => {
           <div v-if="errorText" class="error">
             {{ errorText }}
           </div>
-          <NButton size="small" @click="checkHealth">
+          <NButton size="small" @click="loadDashboard">
             重新检查
           </NButton>
         </NSpace>
@@ -83,6 +121,39 @@ h1 {
 .subtitle {
   margin: 8px 0 0;
   color: #6b635a;
+}
+
+.dashboard {
+  margin-top: 24px;
+}
+
+.recent,
+.status-card {
+  margin-top: 20px;
+}
+
+.recent-item {
+  position: relative;
+  display: block;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 4px;
+  color: white;
+}
+
+.recent-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.recent-item span {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  padding: 2px 7px;
+  border-radius: 12px;
+  background: rgb(0 0 0 / 55%);
 }
 
 .error {

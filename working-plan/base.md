@@ -293,8 +293,8 @@ step 文件按此顺序拆任务。未列出的文件表示该阶段还没写计
 
 | 阶段 | 文件 | 目标 | 计划状态 |
 | --- | --- | --- | --- |
-| 01 | `working-plan/step01.md` | 搭好可运行的 Nuxt 基础框架（空壳、数据库、上传目录） | 已编写 |
-| 02 | `working-plan/step02.md` | 素材入库、检索、编辑 | 未开始 |
+| 01 | `working-plan/step01.md` | 搭好可运行的 Nuxt 基础框架（空壳、数据库、上传目录） | 已完成 |
+| 02 | `working-plan/step02.md` | 素材入库、检索、编辑 | 已编写 |
 | 03 | `working-plan/step03.md` | 集字选图、三种布局、导出 PNG | 未开始 |
 | 04 | `working-plan/step04.md` | 间距调节、作品存档、日常使用打磨 | 未开始 |
 | 05 | `working-plan/step05.md` | 第 2.5 节的增强项，按需单独立项 | 不默认排期 |
