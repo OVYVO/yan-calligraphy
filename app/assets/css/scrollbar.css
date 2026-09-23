@@ -1,0 +1,31 @@
+/* 项目统一细滚动条：2px / 无边框 / 轨道无背景 */
+.ui-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(31, 26, 20, 0.28) transparent;
+}
+
+.ui-scroll::-webkit-scrollbar {
+  width: 2px;
+  height: 2px;
+}
+
+.ui-scroll::-webkit-scrollbar-track {
+  background: transparent;
+  border: none;
+}
+
+.ui-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(31, 26, 20, 0.28);
+  border: none;
+  border-radius: 0;
+}
+
+.ui-scroll::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.ui-scroll::-webkit-scrollbar-corner {
+  background: transparent;
+}

@@ -22,7 +22,13 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 404, message: '不支持的媒体类型' })
 
     setHeader(event, 'Content-Type', contentType)
-    setHeader(event, 'Cache-Control', 'public, max-age=86400')
+    setHeader(
+      event,
+      'Cache-Control',
+      routePath.startsWith('_sessions/')
+        ? 'private, no-store'
+        : 'public, max-age=86400',
+    )
     return await readFile(realFile)
   }
   catch (error) {

@@ -6,6 +6,7 @@ type AssetsView = 'card' | 'list'
 
 const VIEW_STORAGE_KEY = 'yan-calligraphy:assets-view'
 
+const route = useRoute()
 const message = useMessage()
 const items = ref<AssetListResponse['items']>([])
 const total = ref(0)
@@ -16,6 +17,7 @@ const char = ref('')
 const style = ref<string | null>(null)
 const tag = ref('')
 const uploadVisible = ref(false)
+const splitUploadVisible = ref(false)
 const view = ref<AssetsView>('card')
 
 const viewOptions = [
@@ -63,6 +65,10 @@ function changePage(value: number) {
   void loadAssets()
 }
 
+async function onSplitCreated(session: { id: string }) {
+  await navigateTo(`/assets/split?id=${session.id}`)
+}
+
 watch(view, (value) => {
   if (import.meta.client)
     localStorage.setItem(VIEW_STORAGE_KEY, value)
@@ -74,6 +80,8 @@ onMounted(() => {
     if (saved === 'card' || saved === 'list')
       view.value = saved
   }
+  if (typeof route.query.tag === 'string')
+    tag.value = route.query.tag
   void loadAssets()
 })
 </script>
@@ -94,6 +102,9 @@ onMounted(() => {
             :label="option.label"
           />
         </NRadioGroup>
+        <NButton @click="splitUploadVisible = true">
+          多字入库
+        </NButton>
         <NButton type="primary" @click="uploadVisible = true">
           上传素材
         </NButton>
@@ -135,6 +146,11 @@ onMounted(() => {
     <AssetsAssetUploadModal
       v-model:show="uploadVisible"
       @uploaded="search"
+    />
+
+    <SplitUploadModal
+      v-model:show="splitUploadVisible"
+      @created="onSplitCreated"
     />
   </div>
 </template>

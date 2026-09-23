@@ -4,6 +4,7 @@
 > 对应需求：`prd/multi-char-ingest.md`（全文；本阶段只做 **M1**）  
 > 前置：Step 02 素材 CRUD / `/media/**` / sharp；Step 03 集字导出（用于透明 PNG 回归）  
 > 与 Step 04 关系：互不阻塞；可先于或后于 Step 04 实施  
+> 实施状态：编码完成；`pnpm typecheck`、`pnpm build` 已通过；页面交互待用户手动验收
 
 ---
 

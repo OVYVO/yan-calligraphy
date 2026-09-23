@@ -4,6 +4,7 @@ export default defineNuxtConfig({
   ssr: false,
   devtools: { enabled: false },
   modules: ['@pinia/nuxt'],
+  css: ['~/assets/css/scrollbar.css'],
   typescript: {
     strict: true,
   },

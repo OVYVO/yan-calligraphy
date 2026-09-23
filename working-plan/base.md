@@ -170,6 +170,8 @@ uploads/
 | better-sqlite3 | ^13.0.3 |
 | zod | ^4.1（查询时 `4.6.5`） |
 | sharp | 脚手架时取当前稳定版（查询时 `0.35.4`） |
+| konva | ^10.6.0（Step 05 标注画布） |
+| vue-konva | ^4.0.1（Step 05 Vue 绑定） |
 | fabric（备选，非 MVP） | ^7.4.0 |
 
 Nuxt 全栈额外依赖：
@@ -298,7 +300,7 @@ step 文件按此顺序拆任务。未列出的文件表示该阶段还没写计
 | 02 | `working-plan/step02.md` | 素材入库、检索、编辑 | 已完成 |
 | 03 | `working-plan/step03.md` | 集字选图、三种布局、导出 PNG | 已完成 |
 | 04 | `working-plan/step04.md` | 间距调节、拖拽微调、背景与导出打磨 | 已完成 |
-| 05 | `working-plan/step05.md` | 多字图切分入库 M1（对应 `prd/multi-char-ingest.md`） | 计划已编写 |
+| 05 | `working-plan/step05.md` | 多字图切分入库 M1（对应 `prd/multi-char-ingest.md`） | 编码完成，待手动验收 |
 | 06+ | 按需 | 第 2.5 节其余增强项 | 不默认排期 |
 
 MVP 对应阶段 01–03。阶段 04 让日常使用顺手，阶段 05 不阻塞前面的验收。

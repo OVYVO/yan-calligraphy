@@ -4,13 +4,13 @@ export const ASSET_STYLES = ['楷', '行', '草', '隶', '篆', '其他'] as con
 
 export const assetStyleSchema = z.enum(ASSET_STYLES)
 
-const charSchema = z.string()
+export const charSchema = z.string()
   .trim()
   .refine(value => Array.from(value).length === 1 && /^\p{Script=Han}$/u.test(value), {
     message: '汉字必须恰好为一个汉字字符',
   })
 
-const tagsSchema = z.array(z.string()).transform(tags => [
+export const tagsSchema = z.array(z.string()).transform(tags => [
   ...new Set(tags.map(tag => tag.trim()).filter(Boolean)),
 ])
 

@@ -1,0 +1,33 @@
+---
+description: 统一细滚动条样式（2px / 无边框 / 轨道无背景）
+globs: app/**/*.{vue,css}
+alwaysApply: true
+---
+
+# UI 滚动条规范
+
+可滚动容器统一使用项目细滚动条，**不要**使用浏览器默认粗滚动条。
+
+## 必须遵守
+
+- 需要纵向/横向滚动的容器添加 class **`ui-scroll`**（全局样式见 `app/assets/css/scrollbar.css`）
+- 滚动条规格：**宽度 / 高度 `2px`**，**无边框**，**轨道无背景**（`transparent`）
+- 滑块可用低对比半透明色，保证可辨认；禁止加粗、圆角胶囊、轨道底色、双边框装饰
+
+```css
+/* ❌ BAD：默认滚动条或自定义粗样式 */
+.panel { overflow-y: auto; }
+.panel::-webkit-scrollbar { width: 8px; }
+.panel::-webkit-scrollbar-track { background: #eee; }
+
+/* ✅ GOOD */
+.panel {
+  overflow-y: auto;
+}
+/* class="panel ui-scroll" */
+```
+
+## 布局配合
+
+- 固定标题 + 下方列表滚动时：标题 `flex-shrink: 0`，列表容器 `flex: 1; min-height: 0; overflow-y: auto` 并加 `ui-scroll`
+- 不要让外层面板整体滚动把标题卷走

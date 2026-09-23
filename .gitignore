@@ -31,6 +31,7 @@ data/*.sqlite-*
 uploads/originals/**
 uploads/thumbs/**
 uploads/exports/**
+uploads/_sessions/**
 !uploads/**/.gitkeep
 
 # Local install caches

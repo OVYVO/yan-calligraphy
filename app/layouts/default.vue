@@ -47,7 +47,9 @@ const activeKey = computed(() => {
 <style scoped>
 .layout {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
   background: #f7f5f2;
   color: #1f1a14;
 }
@@ -68,8 +70,12 @@ const activeKey = computed(() => {
 }
 
 .content {
+  display: flex;
   flex: 1;
-  padding: 12px;
   min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  padding: 12px;
+  overflow: auto;
 }
 </style>
