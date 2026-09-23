@@ -15,10 +15,6 @@ const menuOptions: MenuOption[] = [
     key: '/assets',
   },
   {
-    label: () => h(NuxtLink, { to: '/compose/new' }, { default: () => '新建集字' }),
-    key: '/compose/new',
-  },
-  {
     label: () => h(NuxtLink, { to: '/compositions' }, { default: () => '作品' }),
     key: '/compositions',
   },
@@ -28,9 +24,7 @@ const activeKey = computed(() => {
   const path = route.path
   if (path.startsWith('/assets'))
     return '/assets'
-  if (path.startsWith('/compose'))
-    return '/compose/new'
-  if (path.startsWith('/compositions'))
+  if (path.startsWith('/compose') || path.startsWith('/compositions'))
     return '/compositions'
   return '/'
 })
