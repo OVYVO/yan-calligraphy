@@ -56,7 +56,7 @@ onMounted(() => {
       书法单字素材库与集字排版工作台
     </p>
 
-    <NGrid cols="1 720:2" :x-gap="20" :y-gap="20" class="dashboard">
+    <NGrid cols="1 720:2" :x-gap="12" :y-gap="12" class="dashboard">
       <NGridItem>
         <NCard title="素材">
           <NStatistic label="素材总数" :value="assetTotal" />
@@ -163,24 +163,24 @@ h1 {
 }
 
 .subtitle {
-  margin: 8px 0 0;
+  margin: 12px 0 0;
   color: #6b635a;
 }
 
 .dashboard {
-  margin-top: 24px;
+  margin-top: 12px;
 }
 
 .recent,
 .status-card {
-  margin-top: 20px;
+  margin-top: 12px;
 }
 
 .composition-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
   padding: 12px 0;
   border-bottom: 1px solid #eee8e0;
   color: inherit;
@@ -202,7 +202,7 @@ h1 {
 }
 
 .composition-text {
-  margin-top: 4px;
+  margin-top: 12px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -226,8 +226,8 @@ h1 {
 
 .recent-item span {
   position: absolute;
-  right: 6px;
-  bottom: 6px;
+  right: 12px;
+  bottom: 12px;
   padding: 2px 7px;
   border-radius: 12px;
   background: rgb(0 0 0 / 55%);

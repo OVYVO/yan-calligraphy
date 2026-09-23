@@ -82,8 +82,8 @@ watch(() => props.char, () => {
 .candidate {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 8px;
+  gap: 12px;
+  padding: 12px;
   border: 1px solid #e6e0d8;
   border-radius: 8px;
   background: #fff;

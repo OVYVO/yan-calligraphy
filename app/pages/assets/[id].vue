@@ -128,7 +128,7 @@ watch(id, loadAsset, { immediate: true })
 
         <NCard title="素材信息">
           <NForm label-placement="top">
-            <NGrid cols="1 560:2" :x-gap="16">
+            <NGrid cols="1 560:2" :x-gap="12">
               <NFormItemGi label="汉字" required>
                 <NInput v-model:value="form.char" maxlength="2" />
               </NFormItemGi>
@@ -188,13 +188,13 @@ watch(id, loadAsset, { immediate: true })
 .page-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .detail-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
-  gap: 24px;
+  gap: 12px;
 }
 
 .main-image {
@@ -203,14 +203,14 @@ watch(id, loadAsset, { immediate: true })
 }
 
 .alternatives {
-  margin-top: 24px;
+  margin-top: 12px;
 }
 
 .alternative {
   display: flex;
   width: 110px;
   flex-direction: column;
-  gap: 6px;
+  gap: 12px;
   color: inherit;
   text-align: center;
   text-decoration: none;

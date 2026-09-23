@@ -91,7 +91,7 @@ const columns = computed<DataTableColumns<AssetDto>>(() => [
     width: 148,
     fixed: 'right',
     render(asset) {
-      return h('div', { style: 'display: flex; gap: 8px;' }, [
+      return h('div', { style: 'display: flex; gap: 12px;' }, [
         h(
           NButton,
           {

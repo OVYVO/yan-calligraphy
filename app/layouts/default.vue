@@ -61,13 +61,13 @@ const activeKey = computed(() => {
 .sidebar {
   width: 220px;
   flex-shrink: 0;
-  padding: 24px 12px;
+  padding: 12px;
   border-right: 1px solid #e6e0d8;
   background: #faf8f5;
 }
 
 .brand {
-  padding: 0 12px 20px;
+  padding: 0 12px 12px;
   font-size: 18px;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -75,7 +75,7 @@ const activeKey = computed(() => {
 
 .content {
   flex: 1;
-  padding: 32px 40px;
+  padding: 12px;
   min-width: 0;
 }
 </style>

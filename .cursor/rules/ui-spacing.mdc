@@ -1,0 +1,37 @@
+---
+description: UI 内外边距与间距统一为 12px
+globs: app/**/*.{vue,css}
+alwaysApply: true
+---
+
+# UI 间距规范
+
+管理台布局间距统一为 **12px**。
+
+## 必须遵守
+
+- `padding` / `margin` / `gap`（含 flex、grid）以及 Naive UI 的 `:x-gap` / `:y-gap` / `NSpace` `:size`，默认且仅使用 **`12px` 或 `12`**
+- 主内容区、侧栏、卡片内边距、区块间距、工具栏、面板间距一律 12px
+- 禁止随意使用 `4 / 6 / 8 / 14 / 16 / 18 / 20 / 24 / 32 / 40` 等作为布局间距
+
+```css
+/* ❌ BAD */
+.content { padding: 32px 40px; }
+.toolbar { gap: 16px; padding: 14px 16px; }
+
+/* ✅ GOOD */
+.content { padding: 12px; }
+.toolbar { gap: 12px; padding: 12px; }
+```
+
+## 允许的例外
+
+| 例外 | 说明 |
+| --- | --- |
+| `0` | 复位（如 `margin: 0`、图片卡 `content-style="padding: 0"`） |
+| `layoutConfig` | 集字领域参数（`cellSize` / `gap` / `lineGap` / `padding`），不是页面 UI 间距 |
+| 画布叠加角标 | 图上极小徽章可用更小内边距；新增 UI 区块仍用 12px |
+
+## 改样式时
+
+先搜附近是否已有非 12 的 `padding`/`margin`/`gap`，一并改到规范，避免同页混用。

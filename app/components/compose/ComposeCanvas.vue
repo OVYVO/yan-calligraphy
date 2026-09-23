@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { CompositionItemDto } from '~~/shared/schemas/composition'
-import type { LayoutConfig } from '~~/shared/layout/defaults'
-import { computeLayout } from '~~/shared/layout/computeLayout'
+import type { LayoutConfig, LayoutType } from '~~/shared/layout/defaults'
+import { resolveCanvasSize } from '~~/shared/layout/bounds'
 import { drawComposition, hitTestCompositionItem } from '~~/shared/layout/drawComposition'
 
 const props = defineProps<{
   items: CompositionItemDto[]
-  layoutType: 'vertical' | 'horizontal' | 'grid'
+  layoutType: LayoutType
   layoutConfig: LayoutConfig
   assetsMap: Map<string, string>
   selectedIndex: number | null
@@ -14,22 +14,32 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:selectedIndex': [index: number]
+  'update:item-position': [index: number, x: number, y: number]
 }>()
 
 const shellRef = ref<HTMLElement | null>(null)
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 const imageCache = new Map<string, HTMLImageElement>()
 const displayScale = ref(1)
+const dragging = ref(false)
 let drawToken = 0
 
-const logicalSize = computed(() => {
-  const layout = computeLayout(
-    props.items.map(item => item.char),
-    props.layoutType,
-    props.layoutConfig,
-  )
-  return { width: layout.width, height: layout.height }
-})
+const dragState = {
+  active: false,
+  index: -1,
+  moved: false,
+  startPointerX: 0,
+  startPointerY: 0,
+  originX: 0,
+  originY: 0,
+}
+
+const logicalSize = computed(() => resolveCanvasSize(
+  props.items.map(item => item.char),
+  props.layoutType,
+  props.layoutConfig,
+  props.items,
+))
 
 async function loadImage(url: string) {
   const cached = imageCache.get(url)
@@ -45,6 +55,17 @@ async function loadImage(url: string) {
   }))
   imageCache.set(url, image)
   return image
+}
+
+function pointerToLogic(event: PointerEvent) {
+  const canvas = canvasRef.value
+  if (!canvas)
+    return null
+  const rect = canvas.getBoundingClientRect()
+  return {
+    x: (event.clientX - rect.left) / displayScale.value,
+    y: (event.clientY - rect.top) / displayScale.value,
+  }
 }
 
 async function draw() {
@@ -100,16 +121,63 @@ async function draw() {
   }, displayScale.value)
 }
 
-function onClick(event: MouseEvent) {
-  const canvas = canvasRef.value
-  if (!canvas)
+function onPointerDown(event: PointerEvent) {
+  if (event.button !== 0)
     return
-  const rect = canvas.getBoundingClientRect()
-  const x = (event.clientX - rect.left) / displayScale.value
-  const y = (event.clientY - rect.top) / displayScale.value
-  const index = hitTestCompositionItem(props.items, props.layoutConfig, x, y)
-  if (index !== null)
-    emit('update:selectedIndex', index)
+  const point = pointerToLogic(event)
+  if (!point)
+    return
+
+  const index = hitTestCompositionItem(props.items, props.layoutConfig, point.x, point.y)
+  if (index === null)
+    return
+
+  const item = props.items[index]
+  if (!item)
+    return
+
+  emit('update:selectedIndex', index)
+  dragState.active = true
+  dragState.index = index
+  dragState.moved = false
+  dragState.startPointerX = event.clientX
+  dragState.startPointerY = event.clientY
+  dragState.originX = item.x
+  dragState.originY = item.y
+  dragging.value = true
+  canvasRef.value?.setPointerCapture(event.pointerId)
+  event.preventDefault()
+}
+
+function onPointerMove(event: PointerEvent) {
+  if (!dragState.active)
+    return
+
+  const dx = (event.clientX - dragState.startPointerX) / displayScale.value
+  const dy = (event.clientY - dragState.startPointerY) / displayScale.value
+  if (!dragState.moved && Math.hypot(dx, dy) < 2)
+    return
+
+  dragState.moved = true
+  emit(
+    'update:item-position',
+    dragState.index,
+    dragState.originX + dx,
+    dragState.originY + dy,
+  )
+}
+
+function endDrag(event: PointerEvent) {
+  if (!dragState.active)
+    return
+  dragState.active = false
+  dragging.value = false
+  try {
+    canvasRef.value?.releasePointerCapture(event.pointerId)
+  }
+  catch {
+    // ignore if capture already released
+  }
 }
 
 watch(
@@ -185,7 +253,15 @@ defineExpose({
 
 <template>
   <div ref="shellRef" class="canvas-shell">
-    <canvas ref="canvasRef" class="compose-canvas" @click="onClick" />
+    <canvas
+      ref="canvasRef"
+      class="compose-canvas"
+      :class="{ dragging }"
+      @pointerdown="onPointerDown"
+      @pointermove="onPointerMove"
+      @pointerup="endDrag"
+      @pointercancel="endDrag"
+    />
   </div>
 </template>
 
@@ -197,7 +273,7 @@ defineExpose({
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  padding: 16px;
+  padding: 12px;
   background:
     linear-gradient(45deg, #ece7de 25%, transparent 25%) 0 0 / 16px 16px,
     linear-gradient(-45deg, #ece7de 25%, transparent 25%) 0 8px / 16px 16px,
@@ -211,7 +287,12 @@ defineExpose({
   display: block;
   max-width: 100%;
   max-height: 100%;
-  cursor: pointer;
+  cursor: grab;
+  touch-action: none;
   box-shadow: 0 8px 24px rgb(31 26 20 / 8%);
+}
+
+.compose-canvas.dragging {
+  cursor: grabbing;
 }
 </style>

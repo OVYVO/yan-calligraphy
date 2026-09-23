@@ -7,6 +7,7 @@ import type {
 } from '~~/shared/schemas/composition'
 import type { LayoutConfig, LayoutType } from '~~/shared/layout/defaults'
 import { DEFAULT_LAYOUT_CONFIG } from '~~/shared/layout/defaults'
+import { resolveCanvasSize } from '~~/shared/layout/bounds'
 import { computeLayout } from '~~/shared/layout/computeLayout'
 import { splitText } from '~~/shared/layout/splitText'
 
@@ -34,13 +35,12 @@ function mergeLayoutItems(
   layoutConfig: LayoutConfig,
   previousItems: CompositionItemDto[] = [],
 ) {
-  const previousByIndex = previousItems
   const layout = computeLayout(chars, layoutType, layoutConfig)
 
   return {
     canvas: layout,
     items: layout.items.map((placement, index) => {
-      const previous = previousByIndex[index]
+      const previous = previousItems[index]
       const matched = previous?.char === placement.char
         ? previous
         : previousItems.find(item => item.char === placement.char && item.assetId)
@@ -55,6 +55,29 @@ function mergeLayoutItems(
       } satisfies CompositionItemDto
     }),
   }
+}
+
+function serializeEditorState(input: {
+  title: string
+  text: string
+  layoutType: LayoutType
+  layoutConfig: LayoutConfig
+  items: CompositionItemDto[]
+}) {
+  return JSON.stringify({
+    title: input.title,
+    text: input.text,
+    layoutType: input.layoutType,
+    layoutConfig: input.layoutConfig,
+    items: input.items.map(({ char, assetId, x, y, scale, rotate }) => ({
+      char,
+      assetId,
+      x,
+      y,
+      scale,
+      rotate,
+    })),
+  })
 }
 
 export async function createCompositionFromText(input: {
@@ -103,6 +126,7 @@ export function useCompositionEditor(compositionId: MaybeRefOrGetter<string>) {
   const loading = ref(true)
   const saving = ref(false)
   const canvasSize = ref({ width: 320, height: 480 })
+  const savedSnapshot = ref('')
 
   const selectedItem = computed(() => items.value[selectedIndex.value] ?? null)
   const assetsMap = computed(() => {
@@ -114,16 +138,44 @@ export function useCompositionEditor(compositionId: MaybeRefOrGetter<string>) {
     return map
   })
 
+  const isDirty = computed(() => {
+    if (!savedSnapshot.value || loading.value)
+      return false
+    return serializeEditorState({
+      title: title.value,
+      text: text.value,
+      layoutType: layoutType.value,
+      layoutConfig: layoutConfig.value,
+      items: items.value,
+    }) !== savedSnapshot.value
+  })
+
+  function refreshCanvasSize(nextItems = items.value, nextType = layoutType.value, nextConfig = layoutConfig.value) {
+    canvasSize.value = resolveCanvasSize(
+      nextItems.map(item => item.char),
+      nextType,
+      nextConfig,
+      nextItems,
+    )
+  }
+
+  function markSaved() {
+    savedSnapshot.value = serializeEditorState({
+      title: title.value,
+      text: text.value,
+      layoutType: layoutType.value,
+      layoutConfig: layoutConfig.value,
+      items: items.value,
+    })
+  }
+
   function applyLayout(nextType = layoutType.value, nextConfig = layoutConfig.value) {
     const chars = items.value.map(item => item.char)
     const merged = mergeLayoutItems(chars, nextType, nextConfig, items.value)
     layoutType.value = nextType
     layoutConfig.value = { ...nextConfig }
     items.value = merged.items
-    canvasSize.value = {
-      width: merged.canvas.width,
-      height: merged.canvas.height,
-    }
+    refreshCanvasSize(merged.items, nextType, nextConfig)
   }
 
   async function load() {
@@ -138,16 +190,13 @@ export function useCompositionEditor(compositionId: MaybeRefOrGetter<string>) {
       layoutConfig.value = { ...data.layoutConfig }
       items.value = data.items
       selectedIndex.value = 0
-      const layout = computeLayout(
-        data.items.map(item => item.char),
-        data.layoutType,
-        data.layoutConfig,
-      )
-      canvasSize.value = { width: layout.width, height: layout.height }
+      refreshCanvasSize(data.items, data.layoutType, data.layoutConfig)
+      markSaved()
     }
     catch (error) {
       message.error(getErrorMessage(error, '作品加载失败'))
       composition.value = null
+      savedSnapshot.value = ''
     }
     finally {
       loading.value = false
@@ -161,6 +210,34 @@ export function useCompositionEditor(compositionId: MaybeRefOrGetter<string>) {
 
   function setLayoutType(next: LayoutType) {
     applyLayout(next, layoutConfig.value)
+  }
+
+  function updateLayoutConfig(partial: Partial<LayoutConfig>) {
+    const next = { ...layoutConfig.value, ...partial }
+    const geometryKeys = ['cellSize', 'gap', 'lineGap', 'padding', 'columns'] as const
+    const affectsGeometry = geometryKeys.some(key =>
+      key in partial && partial[key] !== layoutConfig.value[key],
+    )
+    if (affectsGeometry)
+      applyLayout(layoutType.value, next)
+    else
+      layoutConfig.value = next
+  }
+
+  function resetPositions() {
+    applyLayout(layoutType.value, layoutConfig.value)
+  }
+
+  function moveItem(index: number, x: number, y: number) {
+    const current = items.value[index]
+    if (!current)
+      return
+    items.value[index] = {
+      ...current,
+      x: Math.round(x),
+      y: Math.round(y),
+    }
+    refreshCanvasSize()
   }
 
   function assignAsset(asset: AssetDto) {
@@ -205,7 +282,7 @@ export function useCompositionEditor(compositionId: MaybeRefOrGetter<string>) {
         asset: kept?.char === placement.char ? kept.asset : null,
       }
     })
-    canvasSize.value = { width: layout.width, height: layout.height }
+    refreshCanvasSize()
     selectedIndex.value = 0
   }
 
@@ -232,6 +309,8 @@ export function useCompositionEditor(compositionId: MaybeRefOrGetter<string>) {
       })
       composition.value = updated
       items.value = updated.items
+      refreshCanvasSize(updated.items, updated.layoutType, updated.layoutConfig)
+      markSaved()
       message.success('作品已保存')
     }
     catch (error) {
@@ -259,9 +338,13 @@ export function useCompositionEditor(compositionId: MaybeRefOrGetter<string>) {
     canvasSize,
     loading,
     saving,
+    isDirty,
     load,
     selectIndex,
     setLayoutType,
+    updateLayoutConfig,
+    resetPositions,
+    moveItem,
     assignAsset,
     rebuildFromText,
     save,

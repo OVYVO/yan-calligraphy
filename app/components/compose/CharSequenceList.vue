@@ -35,7 +35,7 @@ defineEmits<{
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   min-height: 0;
   overflow: auto;
 }
@@ -45,7 +45,7 @@ defineEmits<{
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 10px 12px;
+  padding: 12px;
   border: 1px solid #e6e0d8;
   border-radius: 8px;
   background: #fff;

@@ -61,7 +61,7 @@ const { deletingId, confirmDelete } = useAssetDelete((id) =>
 .asset-grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 18px;
+  gap: 12px;
 }
 
 .asset-link {
@@ -87,8 +87,8 @@ const { deletingId, confirmDelete } = useAssetDelete((id) =>
 
 .char-tag {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 12px;
+  left: 12px;
   font-size: 18px;
 }
 
@@ -97,7 +97,7 @@ const { deletingId, confirmDelete } = useAssetDelete((id) =>
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 12px 14px;
+  padding: 12px;
 }
 
 .meta-info {
@@ -105,7 +105,7 @@ const { deletingId, confirmDelete } = useAssetDelete((id) =>
   min-width: 0;
   flex: 1;
   flex-direction: column;
-  gap: 4px;
+  gap: 12px;
 }
 
 .style {

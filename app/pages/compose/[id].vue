@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { useMessage } from 'naive-ui'
-import type { LayoutType } from '~~/shared/layout/defaults'
+import { useDialog, useMessage } from 'naive-ui'
+import type { LayoutConfig, LayoutType } from '~~/shared/layout/defaults'
 
 const route = useRoute()
 const router = useRouter()
 const message = useMessage()
+const dialog = useDialog()
 const id = computed(() => String(route.params.id))
 const canvasRef = ref<{ exportPng: (filename: string) => Promise<void> } | null>(null)
 
@@ -20,8 +21,12 @@ const {
   assetsMap,
   loading,
   saving,
+  isDirty,
   selectIndex,
   setLayoutType,
+  updateLayoutConfig,
+  resetPositions,
+  moveItem,
   assignAsset,
   rebuildFromText,
   save,
@@ -31,15 +36,68 @@ function onLayoutChange(value: LayoutType) {
   setLayoutType(value)
 }
 
+function onLayoutConfigChange(partial: Partial<LayoutConfig>) {
+  updateLayoutConfig(partial)
+}
+
+function onItemPosition(index: number, x: number, y: number) {
+  moveItem(index, x, y)
+}
+
+function exportFilename() {
+  const now = new Date()
+  const stamp = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, '0'),
+    String(now.getDate()).padStart(2, '0'),
+    '-',
+    String(now.getHours()).padStart(2, '0'),
+    String(now.getMinutes()).padStart(2, '0'),
+  ].join('')
+  const base = (title.value.trim() || '集字').replace(/[\\/:*?"<>|]/g, '_')
+  return `${base}-${stamp}.png`
+}
+
 async function exportPng() {
   try {
-    await canvasRef.value?.exportPng(title.value.trim() || '集字作品')
+    await canvasRef.value?.exportPng(exportFilename())
     message.success('已导出 PNG')
   }
   catch (error) {
     message.error(error instanceof Error ? error.message : '导出失败')
   }
 }
+
+const layoutHint = computed(() => {
+  if (layoutType.value === 'vertical')
+    return '竖排单列'
+  if (layoutType.value === 'horizontal')
+    return `横排每行 ${layoutConfig.value.columns} 字`
+  return `宫格 ${layoutConfig.value.columns} 列`
+})
+
+onBeforeRouteLeave(() => {
+  if (!isDirty.value)
+    return true
+
+  return new Promise<boolean>((resolve) => {
+    dialog.warning({
+      title: '尚未保存',
+      content: '当前作品有未保存的修改，确定离开吗？',
+      positiveText: '离开',
+      negativeText: '继续编辑',
+      onPositiveClick: () => {
+        resolve(true)
+      },
+      onNegativeClick: () => {
+        resolve(false)
+      },
+      onClose: () => {
+        resolve(false)
+      },
+    })
+  })
+})
 </script>
 
 <template>
@@ -49,7 +107,10 @@ async function exportPng() {
         <NButton text @click="router.push('/compositions')">
           ← 返回作品列表
         </NButton>
-        <NSpace>
+        <NSpace align="center">
+          <NTag v-if="isDirty" size="small" type="warning">
+            未保存
+          </NTag>
           <NButton :loading="saving" @click="save">
             保存
           </NButton>
@@ -79,7 +140,7 @@ async function exportPng() {
             @update:model-value="onLayoutChange"
           />
           <span class="hint">
-            竖排单列；横排自动换行；宫格 {{ layoutConfig.columns }} 列
+            {{ layoutHint }} · 可拖拽画布中的字微调位置
           </span>
         </div>
       </div>
@@ -94,10 +155,19 @@ async function exportPng() {
             :assets-map="assetsMap"
             :selected-index="selectedIndex"
             @update:selected-index="selectIndex"
+            @update:item-position="onItemPosition"
           />
         </section>
 
         <aside class="side-panel">
+          <div class="panel-block">
+            <ComposeLayoutConfigPanel
+              :layout-type="layoutType"
+              :layout-config="layoutConfig"
+              @change="onLayoutConfigChange"
+              @reset-positions="resetPositions"
+            />
+          </div>
           <div class="panel-block">
             <ComposeCandidatePanel
               :char="selectedItem?.char ?? null"
@@ -132,7 +202,7 @@ async function exportPng() {
 <style scoped>
 .editor-spin {
   display: block;
-  height: calc(100vh - 64px);
+  height: calc(100vh - 24px);
 }
 
 .editor-spin :deep(.n-spin-content) {
@@ -160,8 +230,8 @@ async function exportPng() {
   flex-wrap: wrap;
   align-items: end;
   justify-content: space-between;
-  gap: 16px;
-  padding: 14px 16px;
+  gap: 12px;
+  padding: 12px;
   border: 1px solid #e6e0d8;
   border-radius: 8px;
   background: #fff;
@@ -180,7 +250,7 @@ async function exportPng() {
   display: flex;
   width: 180px;
   flex-direction: column;
-  gap: 6px;
+  gap: 12px;
 }
 
 .field-text {
@@ -209,7 +279,7 @@ async function exportPng() {
 .workspace {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 300px;
-  gap: 16px;
+  gap: 12px;
   flex: 1;
   min-height: 0;
 }
@@ -229,7 +299,7 @@ async function exportPng() {
 }
 
 .panel-block {
-  padding: 14px;
+  padding: 12px;
   border: 1px solid #e6e0d8;
   border-radius: 8px;
   background: #fff;
@@ -243,14 +313,14 @@ async function exportPng() {
 }
 
 .section-title {
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   font-weight: 600;
 }
 
 @media (max-width: 960px) {
   .editor-spin {
     height: auto;
-    min-height: calc(100vh - 64px);
+    min-height: calc(100vh - 24px);
   }
 
   .workspace {

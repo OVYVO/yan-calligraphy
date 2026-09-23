@@ -30,11 +30,11 @@ function verticalLayout(chars: string[], config: LayoutConfig): LayoutResult {
 }
 
 function horizontalLayout(chars: string[], config: LayoutConfig): LayoutResult {
-  const { cellSize, gap, lineGap, padding } = config
-  const columns = Math.max(1, Math.min(8, chars.length || 1))
+  const { cellSize, gap, lineGap, padding, columns } = config
+  const cols = Math.max(1, columns)
   const items = chars.map((char, index) => {
-    const col = index % columns
-    const row = Math.floor(index / columns)
+    const col = index % cols
+    const row = Math.floor(index / cols)
     return {
       char,
       x: padding + col * (cellSize + gap),
@@ -42,8 +42,8 @@ function horizontalLayout(chars: string[], config: LayoutConfig): LayoutResult {
       size: cellSize,
     }
   })
-  const rows = Math.max(1, Math.ceil(chars.length / columns))
-  const usedColumns = Math.min(columns, Math.max(chars.length, 1))
+  const rows = Math.max(1, Math.ceil(chars.length / cols))
+  const usedColumns = Math.min(cols, Math.max(chars.length, 1))
 
   return {
     width: padding * 2 + usedColumns * cellSize + Math.max(usedColumns - 1, 0) * gap,

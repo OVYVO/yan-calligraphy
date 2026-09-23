@@ -98,7 +98,7 @@ async function submit() {
           选择图片
         </NUpload>
       </NFormItem>
-      <NGrid cols="1 640:2" :x-gap="16">
+      <NGrid cols="1 640:2" :x-gap="12">
         <NFormItemGi label="汉字（本批共用）" required>
           <NInput v-model:value="char" maxlength="2" placeholder="例如：永" />
         </NFormItemGi>

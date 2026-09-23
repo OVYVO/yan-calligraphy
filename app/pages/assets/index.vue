@@ -144,8 +144,8 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 20px;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 h1 {
@@ -153,18 +153,18 @@ h1 {
 }
 
 .page-header p {
-  margin: 6px 0 0;
+  margin: 12px 0 0;
   color: #756d63;
 }
 
 .content-area {
   min-height: 260px;
-  padding: 24px 0;
+  padding: 12px 0;
 }
 
 .pagination {
   display: flex;
   justify-content: center;
-  padding: 8px 0 24px;
+  padding: 12px 0;
 }
 </style>

@@ -4,6 +4,7 @@ import { NButton, useDialog, useMessage } from 'naive-ui'
 import { h } from 'vue'
 import type { CompositionListResponse, CompositionSummaryDto } from '~~/shared/schemas/composition'
 import { LAYOUT_TYPE_LABELS } from '~~/shared/layout/defaults'
+import { splitText } from '~~/shared/layout/splitText'
 
 const router = useRouter()
 const message = useMessage()
@@ -79,6 +80,14 @@ const columns = computed<DataTableColumns<CompositionSummaryDto>>(() => [
     },
   },
   {
+    title: '字数',
+    key: 'charCount',
+    width: 72,
+    render(row) {
+      return splitText(row.text).length
+    },
+  },
+  {
     title: '更新时间',
     key: 'updatedAt',
     width: 180,
@@ -91,7 +100,7 @@ const columns = computed<DataTableColumns<CompositionSummaryDto>>(() => [
     key: 'actions',
     width: 160,
     render(row) {
-      return h('div', { style: 'display:flex;gap:8px;' }, [
+      return h('div', { style: 'display:flex;gap:12px;' }, [
         h(NButton, {
           size: 'tiny',
           onClick: () => router.push(`/compose/${row.id}`),
@@ -160,8 +169,8 @@ onMounted(loadCompositions)
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 20px;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 h1 {
@@ -169,13 +178,13 @@ h1 {
 }
 
 .page-header p {
-  margin: 6px 0 0;
+  margin: 12px 0 0;
   color: #756d63;
 }
 
 .pagination {
   display: flex;
   justify-content: center;
-  padding: 24px 0 8px;
+  padding: 12px 0;
 }
 </style>

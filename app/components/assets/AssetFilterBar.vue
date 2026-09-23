@@ -15,7 +15,7 @@ const styleOptions = ASSET_STYLES.map(value => ({ label: value, value }))
 
 <template>
   <NCard size="small">
-    <NSpace align="center" :wrap="true">
+    <NSpace align="center" :wrap="true" :size="12">
       <NInput
         v-model:value="char"
         clearable

@@ -97,8 +97,8 @@ async function startCompose() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 20px;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 h1 {
@@ -107,11 +107,11 @@ h1 {
 
 .page-header p,
 .preview {
-  margin: 6px 0 0;
+  margin: 12px 0 0;
   color: #756d63;
 }
 
 .preview {
-  margin: 0 0 20px;
+  margin: 0 0 12px;
 }
 </style>

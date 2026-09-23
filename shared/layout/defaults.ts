@@ -25,3 +25,11 @@ export const LAYOUT_TYPE_LABELS: Record<LayoutType, string> = {
   horizontal: '横排',
   grid: '宫格',
 }
+
+export const BACKGROUND_PRESETS = [
+  { label: '浅宣', value: '#f7f3eb' },
+  { label: '米黄', value: '#f3e6c8' },
+  { label: '雪白', value: '#ffffff' },
+  { label: '淡青', value: '#eef3ef' },
+  { label: '墨底', value: '#2b2926' },
+] as const

@@ -1,9 +1,9 @@
 # yan-calligraphy 指导大纲
 
-> 更新时间：2026-09-21  
+> 更新时间：2026-09-23  
 > 文档角色：后续 `working-plan/stepNN.md` 的指导性大纲  
 > 项目路径：`/Users/yangang/Desktop/code/yan-calligraphy`  
-> 代码状态：尚未搭建脚手架
+> 代码状态：阶段 01–04 已落地；多字切分入库见 `prd/multi-char-ingest.md`
 
 ---
 
@@ -88,7 +88,7 @@
 
 ### 2.4 明确不做（MVP）
 
-- 自动抠字、去背景、OCR 识别汉字  
+- ~~自动抠字、去背景、OCR 识别汉字~~ → 已立项为增强，见第 2.5 节第 1 项与 `prd/multi-char-ingest.md`  
 - 生成矢量字或 TTF 字体  
 - 多用户、登录、权限  
 - 公开字库或社区  
@@ -101,8 +101,8 @@
 
 按价值排序，需要时再单独立项：
 
-1. 批量上传，以及从文件名辅助填写汉字  
-2. 简易去底、居中裁切  
+1. **多字图切分入库**（已写需求）：上传含多字的整图 → 文字区域识别（可手动补标）→ 透明背景抠图 → 拆成单字素材写入现有素材库。需求全文：`prd/multi-char-ingest.md`；实施计划：`working-plan/step05.md`  
+2. 批量上传，以及从文件名辅助填写汉字  
 3. 对联、斗方等专用模板  
 4. 画布内拖拽微调、宣纸等背景  
 5. 局域网手机上传  
@@ -127,6 +127,7 @@
 | 元数据 | SQLite 单文件：`data/yan-calligraphy.sqlite` |
 | 图片 | 项目目录 `uploads/`，不进数据库 |
 | UI 组件 | Naive UI，管理台用中文 |
+| UI 间距 | **内外边距与布局 gap 统一 12px**（见 `.cursor/rules/ui-spacing.mdc`）；`0` 复位与集字 `layoutConfig` 除外 |
 | 客户端状态 | Pinia，只管编辑草稿、筛选等界面状态 |
 | 集字画布 | MVP 用原生 Canvas 2D；拖拽复杂度上来再评估 Fabric |
 | 图片处理 | sharp：缩略图，以及日后的服务端缩放 |
@@ -295,9 +296,10 @@ step 文件按此顺序拆任务。未列出的文件表示该阶段还没写计
 | --- | --- | --- | --- |
 | 01 | `working-plan/step01.md` | 搭好可运行的 Nuxt 基础框架（空壳、数据库、上传目录） | 已完成 |
 | 02 | `working-plan/step02.md` | 素材入库、检索、编辑 | 已完成 |
-| 03 | `working-plan/step03.md` | 集字选图、三种布局、导出 PNG | 已编写 |
-| 04 | `working-plan/step04.md` | 间距调节、作品存档、日常使用打磨 | 未开始 |
-| 05 | `working-plan/step05.md` | 第 2.5 节的增强项，按需单独立项 | 不默认排期 |
+| 03 | `working-plan/step03.md` | 集字选图、三种布局、导出 PNG | 已完成 |
+| 04 | `working-plan/step04.md` | 间距调节、拖拽微调、背景与导出打磨 | 已完成 |
+| 05 | `working-plan/step05.md` | 多字图切分入库 M1（对应 `prd/multi-char-ingest.md`） | 计划已编写 |
+| 06+ | 按需 | 第 2.5 节其余增强项 | 不默认排期 |
 
 MVP 对应阶段 01–03。阶段 04 让日常使用顺手，阶段 05 不阻塞前面的验收。
 
